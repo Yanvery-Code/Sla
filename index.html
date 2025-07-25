@@ -307,6 +307,7 @@
         })
         .sort((a, b) => a.tahun - b.tahun);
 
+      currentIndex = -2; // Reset to start from the banner
       showSlide();
     } catch (error) {
       console.error("Gagal memuat data:", error);
@@ -317,6 +318,13 @@
   function showSlide() {
     clearTimeout(slideTimeout);
     const container = document.getElementById('app');
+
+    // Jika sudah selesai satu putaran, perbarui data
+    if (currentIndex >= groupedData.length) {
+        container.innerHTML = `<div class="angkatan-title" style="font-size: 2.5em;">Memperbarui data...</div>`;
+        setTimeout(fetchData, 1500); // Beri jeda agar pesan terlihat
+        return;
+    }
 
     if (currentIndex === -2) {
       container.innerHTML = `
