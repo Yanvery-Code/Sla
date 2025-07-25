@@ -260,17 +260,83 @@
 
   const warnaList = ['#003300', '#006600', '#009900', '#00CC66', '#336633', '#228B22', '#2E8B57', '#3CB371', '#006400', '#32CD32'];
 
+  // Helper function to parse a single CSV line, handling quoted fields
+  function parseCSVLine(line) {
+    const result = [];
+    let inQuote = false;
+    let currentField = '';
+    for (let i = 0; i < line.length; i++) {
+      const char = line[i];
+      if (char === '"') {
+        // Handle escaped quotes "" inside a quoted field
+        if (inQuote && line[i + 1] === '"') {
+          currentField += '"';
+          i++; // Skip the next quote
+        } else {
+          inQuote = !inQuote;
+        }
+      } else if (char === ',' && !inQuote) {
+        result.push(currentField);
+        currentField = '';
+      } else {
+        currentField += char;
+      }
+    }
+    result.push(currentField); // Add the last field
+    return result;
+  }
+
   async function fetchData() {
     try {
       const res = await fetch(sheetURL);
       const text = await res.text();
-      const rows = text.split('\n').slice(1).map(row => row.split(','));
-      
-      const allEntries = rows.map(row => ({
-        nama: row[1]?.trim(),
-        no_hp: row[2]?.trim(), // Asumsi: no HP ada di kolom ke-3 (index 2)
-        angkatan: row[3]?.trim()
-      })).filter(r => r.nama && r.no_hp && r.angkatan);
+
+      const lines = text.split('\n');
+      let csvStartIndex = -1;
+      let headers = [];
+      let namaIndex = -1;
+      let noHpIndex = -1;
+      let angkatanIndex = -1;
+
+      // Find header row and parse headers
+      for (let i = 0; i < lines.length; i++) {
+        const lowerCaseLine = lines[i].toLowerCase();
+        if (lowerCaseLine.includes('timestamp') && lowerCaseLine.includes('nama') && lowerCaseLine.includes('no hp') && lowerCaseLine.includes('angkatan')) {
+          csvStartIndex = i;
+          headers = parseCSVLine(lines[i]).map(h => h.toLowerCase());
+          namaIndex = headers.indexOf('nama');
+          noHpIndex = headers.indexOf('no hp');
+          angkatanIndex = headers.indexOf('angkatan');
+          break;
+        }
+      }
+
+      if (csvStartIndex === -1 || namaIndex === -1 || noHpIndex === -1 || angkatanIndex === -1) {
+        console.error("Baris header atau kolom kunci tidak ditemukan dalam data CSV.");
+        document.getElementById('app').innerHTML = 'Gagal memuat data: Header CSV atau kolom kunci tidak ditemukan.';
+        return;
+      }
+
+      const csvDataLines = lines.slice(csvStartIndex + 1);
+
+      const allEntries = csvDataLines.map(line => {
+        if (!line.trim()) return null; // Skip empty lines
+        const row = parseCSVLine(line);
+        
+        
+
+        // Safely access and trim values using dynamic indices
+        const nama = row[namaIndex] ? row[namaIndex].trim() : '';
+        const no_hp = row[noHpIndex] ? row[noHpIndex].trim() : '';
+        const angkatan = row[angkatanIndex] ? row[angkatanIndex].trim() : '';
+
+        
+
+        if (!nama || !no_hp || !angkatan) {
+            return null;
+        }
+        return { nama, no_hp, angkatan };
+      }).filter(r => r); // Filter out nulls
 
       const uniqueEntries = new Map();
       for (const entry of allEntries) {
