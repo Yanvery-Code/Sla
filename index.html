@@ -201,6 +201,8 @@
 
 <script>
   const sheetURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTNBTssHCSc8L2fZPeg76fVH6BcBFL6YqXFKoSrA2zhtU4g1R5wiU-lJ4eqAn1ePXJotiTS0FNa3j_L/pub?output=csv';
+//const sheetURL = https://docs.google.com/spreadsheets/d/e/2PACX-1vTNBTssHCSc8L2fZPeg76fVH6BcBFL6YqXFKoSrA2zhtU4g1R5wiU-lJ4eqAn1ePXJotiTS0FNa3j_L/pubhtml?gid=584891017&single=true
+
 
   let groupedData = [];
   let allUniqueData = [];
@@ -222,7 +224,7 @@
       
       const allEntries = rows.map(row => ({
         nama: row[1]?.trim(),
-        no_hp: row[2]?.trim(),
+        no_hp: row[2]?.trim(), // Asumsi: no HP ada di kolom ke-3 (index 2)
         angkatan: row[3]?.trim()
       })).filter(r => r.nama && r.no_hp && r.angkatan);
 
