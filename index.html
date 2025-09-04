@@ -274,7 +274,11 @@
 </div>
 
 <button id="fullscreen-btn" onclick="toggleFullscreen()">Fullscreen</button>
-<div class="overlay" id="app">Memuat data...</div>
+<div class="overlay" id="app">
+  <!-- <iframe src="https://lookerstudio.google.com/embed/reporting/fa0561b2-9371-4a0c-bdd1-ebab4135c55b/page/qgR" frameborder="0" style="border:0; width:100%; height:100%;" allowfullscreen sandbox="allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"></iframe> -->
+<iframe width="1000" height="750" src="https://lookerstudio.google.com/embed/reporting/fa0561b2-9371-4a0c-bdd1-ebab4135c55b/page/qgR" frameborder="0" style="border:0" allowfullscreen sandbox="allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"></iframe>
+</div>
+
 
 <div id="controls">
   <button id="prev-btn" onclick="manualNavigate(-1)">Prev</button>
@@ -341,6 +345,10 @@
   const pageSize = 20;
 
   const warnaList = ['#003300', '#006600', '#009900', '#00CC66', '#336633', '#228B22', '#2E8B57', '#3CB371', '#006400', '#32CD32'];
+
+  // --- PENGATURAN ---
+  // Waktu (dalam milidetik) untuk menampilkan Looker Studio sebelum slide dimulai. 1000 = 1 detik.
+  const LOOKER_STUDIO_DELAY = 30000; // 30 detik
 
   async function fetchData() {
     try {
@@ -416,8 +424,11 @@
       }
 
       currentIndex = 0;
-      showSlide();
-      startMusic();
+      // Jeda agar Looker Studio sempat tampil, sesuai pengaturan LOOKER_STUDIO_DELAY
+      setTimeout(() => {
+        showSlide();
+        startMusic();
+      }, LOOKER_STUDIO_DELAY);
     } catch (error) {
       console.error("Gagal memuat data:", error);
       document.getElementById('app').innerHTML = 'Gagal memuat data. Silakan cek koneksi dan coba lagi. Pastikan juga script sudah di-deploy ulang.';
@@ -590,6 +601,27 @@
       document.exitFullscreen();
     }
   }
+
+  fetchData();
+</script>
+</body>
+</html>
+ fullscreen: ${err.message}`));
+    } else {
+      document.exitFullscreen();
+    }
+  }
+
+  fetchData();
+</script>
+</body>
+</html>
+
+  fetchData();
+</script>
+</body>
+</html>
+</html>
 
   fetchData();
 </script>
